@@ -1,17 +1,20 @@
 import axios, { AxiosResponse } from "axios";
-import { ApiResponse } from "../types/types";
+import { apiRequest } from "./request";
 
-const BaseUrl = "http://127.0.0.1:3000";
+const BaseUrl = "http://10.134.142.87:3000";
 
 // tester si la connexion au serveur est etablie f
 const Params = {};
 export const UnmixService = {
-  UploadFile: async (formData: FormData) => {
-    const response: any = axios.post(BaseUrl + "/unmix", formData);
-    return response;
+  UploadFile: async (file: FormData) => {
+    return apiRequest("post", "/unmix", file, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
   },
   CheckStatus: async (jobId: string) => {
-    const response: any = axios.get(BaseUrl + "/status/" + jobId);
-    return response;
+    return apiRequest("get", `status/${jobId}`);
+  },
+  DownloadFile: async (id: string) => {
+    return apiRequest("get", `download/${id}`);
   },
 };

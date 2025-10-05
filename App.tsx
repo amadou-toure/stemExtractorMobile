@@ -12,8 +12,13 @@ import PlayerScreen from "./src/screens/playerScreen";
 import SettingsScreen from "./src/screens/settingsScreen";
 import { LoadingProvider, useLoading } from "./context/loadingContext";
 import LoadingScreen from "./src/components/loadingScreen";
+import { historyService } from "./src/services/historyService";
 
 export default function Root() {
+  const init = async () => {
+    historyService.initHistoryFile();
+  };
+  init();
   return (
     <LoadingProvider>
       <App />
@@ -35,7 +40,7 @@ function App() {
             { backgroundColor: MainColor.bgColor },
           ]}
         >
-          <LoadingScreen />
+          <LoadingScreen type="loading" />
         </View>
       ) : (
         <Tab.Navigator

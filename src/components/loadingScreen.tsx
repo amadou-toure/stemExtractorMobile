@@ -22,11 +22,23 @@ export default function LoadingScreen({
         }}
       />
     );
+  } else if (type == "processing") {
+    return (
+      <LottieView
+        source={require("./animation/lottie/processing.json")}
+        autoPlay
+        style={{
+          height: height ?? 200,
+          width: width ?? 200,
+        }}
+      />
+    );
   } else {
     return (
       <LottieView
         source={require("./animation/lottie/loading.json")}
         autoPlay
+        loop
         style={{
           height: height ?? 200,
           width: width ?? 200,
