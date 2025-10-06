@@ -18,6 +18,7 @@ export type SongStems = {
   artist?: string; // (optionnel) Artiste
   stems: StemFile[]; // Liste des stems
   zipUri?: string; // Optionnel: chemin vers le .zip si tu veux le garder
+  creationDate?: string;
 };
 
 export type RenderIconProps = {

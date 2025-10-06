@@ -60,6 +60,7 @@ const UploadScreen = () => {
         title: selectedFile.name,
         artist: "",
         stems: [],
+        creationDate: new Date().toISOString(),
       };
       historyService.addHistoryItem(newSongStem);
 
