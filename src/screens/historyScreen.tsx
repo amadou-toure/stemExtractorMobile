@@ -1,14 +1,7 @@
 //import liraries
 
 import { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  StyleSheet,
-  Button,
-  TouchableOpacity,
-  FlatList,
-} from "react-native";
+import { View, TouchableOpacity, FlatList } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { GlobalStyles, MainColor } from "../style/global.style";
 import { Plus, SquareDashed } from "lucide-react-native";
@@ -24,9 +17,9 @@ const HistoryScreen = () => {
   const [data, setData] = useState<SongStems[]>([]);
   const checkStatus = async (item: SongStems) => {
     if (item.status === "processing") {
+      const response = await UnmixService.CheckStatus(item.id);
+      const status = response.data;
       const interval = setInterval(async () => {
-        const response = await UnmixService.CheckStatus(item.id);
-        const status = response.data;
         if (status === "done" || status === "not_found") {
           setData((prevData) =>
             prevData.map((d) =>
@@ -37,7 +30,7 @@ const HistoryScreen = () => {
         } else {
           console.log(status);
         }
-      }, 45000);
+      }, 5000);
       return () => clearInterval(interval);
     }
   };

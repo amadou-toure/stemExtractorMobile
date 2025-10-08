@@ -1,14 +1,18 @@
 import { Directory, File, FileInfo, Paths } from "expo-file-system";
-import { ApiResponse, SongStems } from "../types/types";
+import { ApiResponse, SongStems, StemFile } from "../types/types";
 import { Alert } from "react-native";
 import { UnmixService } from "./unmixService";
 import { unzip } from "react-native-zip-archive";
+import { apiClient } from "./apiClient";
 
 const AppDirectory = new Directory(Paths.document, "Unmix");
-const APIUrl = "http://10.134.142.87:3000";
+const Cache = new Directory(Paths.cache);
+
+const APIUrl = "http://192.168.2.20:3000";
 export const historyService = {
   initHistoryFile: async () => {
     try {
+      Cache.delete;
       if (!AppDirectory.exists) {
         await AppDirectory.create({ intermediates: true });
       }
@@ -49,6 +53,31 @@ export const historyService = {
     await HISTORY_FILE.write(JSON.stringify(history, null, 2));
     console.log(await historyService.readHistory());
   },
+  updateHistoryItem: async (updatedItem: SongStems) => {
+    try {
+      const history = await historyService.readHistory();
+      const HISTORY_FILE = new File(AppDirectory, "history.json");
+
+      // Cherche l'index de l'élément à modifier
+      const index = history.findIndex(
+        (item: SongStems) => item.id === updatedItem.id
+      );
+
+      if (index !== -1) {
+        // Remplace l’ancien élément par le nouveau
+        history[index] = updatedItem;
+
+        // Écrit le fichier mis à jour
+        await HISTORY_FILE.write(JSON.stringify(history, null, 2));
+
+        console.log("✅ Élément mis à jour:", updatedItem.stems);
+      } else {
+        console.warn("⚠️ Élément non trouvé pour l’ID:", updatedItem.id);
+      }
+    } catch (e) {
+      console.error("Erreur updateHistoryItem:", e);
+    }
+  },
 
   removeHistoryItem: async (id: string) => {
     const history = await historyService.readHistory();
@@ -66,39 +95,55 @@ export const historyService = {
   },
   downloadStem: async (song: SongStems) => {
     try {
-      const zipDir = new Directory(AppDirectory, "stems");
-      if (!zipDir.exists) {
-        zipDir.create({ intermediates: true });
+      const songDir = new Directory(Cache, "songs");
+      if (!songDir.exists) {
+        songDir.create({ intermediates: true });
       }
-      const zipFile = new File(
-        zipDir,
-        song.title.replace(/\.[^/.]+$/, "") + ".zip"
-      );
+      const zipFile = new File(Cache, song.id + ".zip");
       const file = await File.downloadFileAsync(
         APIUrl + "/download/" + song.id,
         zipFile
       );
-
+      //EOF
+      //unzip func
       if (file.exists) {
-        // unzip(
-        //   file.uri,
-        //   new Directory(zipDir, song.title.replace(/\.[^/.]+$/, "")).uri
-        // )
-        //   .then((path) => {
-        //     console.log(`Décompression réussie dans: ${path}`);
-        //   })
-        //   .catch((err: any) => {
-        //     console.error("Erreur unzip:", err);
-        //   });
-      }
+        const stemDir = new Directory(songDir, song.id);
+        await unzip(file.uri, stemDir.uri)
+          .then((path) => {
+            console.log(`Décompression réussie dans: ${path}`);
+            console.log("taille: ", stemDir.size);
+            // Affiche le nom de tous les fichiers contenus dans stemDir
+            const filesInStemDir = new Directory(stemDir, song.id).list();
+            const stemFiles: StemFile[] = [];
+            filesInStemDir.forEach((f: any) => {
+              const file: StemFile = {
+                name: f.name,
+                duration: 475678758, //to change when i will implement audioservice
+                uri: f.uri,
+                format: f.name.split(".").pop()?.toLowerCase() || "unknown",
+              };
 
-      //   //  save to AppDirectory/stems
-      //   //  copy the stem path into the correspondig song in the history file
-      // } else {
-      //   console.log(file.message, file.status);
-      // }
+              stemFiles.push(file);
+            });
+            // console.log(
+            //   "songDir files:",
+            //   stemFiles.map((f) => f.name)
+            // );
+            const updatedSong: SongStems = { ...song, stems: stemFiles };
+            console.log(updatedSong);
+            historyService.updateHistoryItem(updatedSong);
+            zipFile.delete();
+          })
+          .catch((err: any) => {
+            console.error("Erreur unzip:", err);
+          });
+      }
+      //EOF
+      else {
+        console.log("erreur lors du telechargement");
+      }
     } catch (e: any) {
-      console.error(e.message);
+      console.error("exception: ", e.message);
     }
   },
 };

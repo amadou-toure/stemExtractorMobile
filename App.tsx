@@ -11,6 +11,10 @@ import { GlobalStyles, MainColor } from "./src/style/global.style";
 import PlayerScreen from "./src/screens/playerScreen";
 import SettingsScreen from "./src/screens/settingsScreen";
 import { LoadingProvider, useLoading } from "./context/loadingContext";
+import {
+  SelectedSongProvider,
+  useSelectedSong,
+} from "./context/selectedSnongContext";
 import LoadingScreen from "./src/components/loadingScreen";
 import { historyService } from "./src/services/historyService";
 
@@ -21,7 +25,9 @@ export default function Root() {
   init();
   return (
     <LoadingProvider>
-      <App />
+      <SelectedSongProvider>
+        <App />
+      </SelectedSongProvider>
     </LoadingProvider>
   );
 }
@@ -47,7 +53,7 @@ function App() {
           screenOptions={({ route }) => ({
             tabBarIcon: ({ color, size }) => {
               let IconComponent = null;
-              if (route.name === "hystory") {
+              if (route.name === "history") {
                 IconComponent = Clock;
               } else if (route.name === "upload") {
                 IconComponent = Upload;
@@ -76,7 +82,7 @@ function App() {
             tabBarInactiveTintColor: MainColor.InactiveTextColor,
           })}
         >
-          <Tab.Screen name="hystory" component={HystoryScreen} />
+          <Tab.Screen name="history" component={HystoryScreen} />
           <Tab.Screen name="upload" component={UploadScreen} />
           <Tab.Screen name="player" component={PlayerScreen} />
           <Tab.Screen name="settings" component={SettingsScreen} />

@@ -24,15 +24,25 @@ import { useNavigation } from "@react-navigation/native";
 import LoadingScreen from "./loadingScreen";
 import { historyService } from "../services/historyService";
 import { UnmixService } from "../services/unmixService";
+import { useLoading } from "../../context/loadingContext";
+import { useSelectedSong } from "../../context/selectedSnongContext";
 
 // create a component
 
 const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
-  const handlePress = () => {
+  const { setLoading } = useLoading();
+  const { setSelectedSong } = useSelectedSong();
+  const handlePress = async () => {
     if (status != "done") {
       Alert.alert("pending", "unmixing is pending");
     } else {
-      historyService.downloadStem(song);
+      //setLoading(true);
+      await historyService.downloadStem(song).then(() => {
+        setSelectedSong(song);
+        navigator.navigate(`player`);
+        //setLoading(false);
+      });
+      //setLoading(false);
     }
   };
   const navigator = useNavigation();

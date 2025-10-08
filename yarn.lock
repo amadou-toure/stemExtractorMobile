@@ -1299,6 +1299,11 @@
   resolved "https://registry.yarnpkg.com/@pkgjs/parseargs/-/parseargs-0.11.0.tgz#a77ea742fab25775145434eb1d2328cf5013ac33"
   integrity sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==
 
+"@react-native-community/slider@^5.0.1":
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/@react-native-community/slider/-/slider-5.0.1.tgz#478789e526af31e0660c6f49fa5c5429d8d4287b"
+  integrity sha512-K3JRWkIW4wQ79YJ6+BPZzp1SamoikxfPRw7Yw4B4PElEQmqZFrmH9M5LxvIo460/3QSrZF/wCgi3qizJt7g/iw==
+
 "@react-native/assets-registry@0.81.4":
   version "0.81.4"
   resolved "https://registry.yarnpkg.com/@react-native/assets-registry/-/assets-registry-0.81.4.tgz#bfa477c8e9d54d6ef4ab6e81b886d5be13c09fbd"
@@ -2718,7 +2723,7 @@ expo-modules-core@3.0.17:
   dependencies:
     invariant "^2.2.4"
 
-expo-status-bar@~3.0.8:
+expo-status-bar@^3.0.8:
   version "3.0.8"
   resolved "https://registry.yarnpkg.com/expo-status-bar/-/expo-status-bar-3.0.8.tgz#ada8b863a405f1619cd87a4b2b874d84e7d21ce5"
   integrity sha512-L248XKPhum7tvREoS1VfE0H6dPCaGtoUWzRsUv7hGKdiB4cus33Rc0sxkWkoQ77wE8stlnUlL5lvmT0oqZ3ZBw==
