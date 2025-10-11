@@ -36,13 +36,11 @@ const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
     if (status != "done") {
       Alert.alert("pending", "unmixing is pending");
     } else {
-      //setLoading(true);
       await historyService.downloadStem(song).then(() => {
         setSelectedSong(song);
+
         navigator.navigate(`player`);
-        //setLoading(false);
       });
-      //setLoading(false);
     }
   };
   const navigator = useNavigation();

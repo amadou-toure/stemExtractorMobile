@@ -1,14 +1,15 @@
 //import liraries
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { StemFile } from "../types/types";
 import { GlobalStyles, MainColor } from "../style/global.style";
-import { Mic, Volume2 } from "lucide-react-native";
-import { StatusBar } from "expo-status-bar";
-import Slider from "@react-native-community/slider";
+import { AudioLines, Drum, Mic, Speaker, Volume2 } from "lucide-react-native";
+//import Slider from "@react-native-community/slider";
+import { Slider } from "@rneui/themed";
 
 // create a component
 const StemTile = ({ file }: { file: StemFile }) => {
+  const [value, setValue] = useState(0);
   return (
     <View style={styles.container}>
       <View
@@ -31,7 +32,15 @@ const StemTile = ({ file }: { file: StemFile }) => {
             width: "15%",
           }}
         >
-          <Mic color={MainColor.ButtonColor} />
+          {file.name === "vocals.wav" ? (
+            <Mic color={MainColor.ButtonColor} />
+          ) : file.name === "bass.wav" ? (
+            <Speaker color={MainColor.ButtonColor} />
+          ) : file.name === "drums.wav" ? (
+            <Drum color={MainColor.ButtonColor} />
+          ) : (
+            <AudioLines color={MainColor.ButtonColor} />
+          )}
         </View>
         <View
           style={{
@@ -45,11 +54,21 @@ const StemTile = ({ file }: { file: StemFile }) => {
         >
           <Text style={GlobalStyles.Large_text}>{file.name}</Text>
           <Slider
-            style={{ width: 200, height: 40 }}
+            //style={{ width: "100%" }}
+            value={value}
+            onValueChange={setValue}
             minimumValue={0}
-            maximumValue={1}
-            minimumTrackTintColor="#FFFFFF"
-            maximumTrackTintColor="#000000"
+            maximumValue={10}
+            minimumTrackTintColor={MainColor.AccentColor}
+            maximumTrackTintColor={MainColor.InactiveTextColor}
+            style={{ width: "100%", alignSelf: "center" }}
+            trackStyle={{ height: 6, borderRadius: 6 }}
+            thumbStyle={{
+              height: 18,
+              width: 18,
+              borderRadius: 18,
+              backgroundColor: MainColor.AccentColor,
+            }}
           />
         </View>
         <View
@@ -74,7 +93,7 @@ const styles = StyleSheet.create({
   container: {
     display: "flex",
     flexDirection: "column",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
     backgroundColor: MainColor.SecondaryColor,
     height: 100,

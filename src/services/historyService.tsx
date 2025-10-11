@@ -96,55 +96,64 @@ export const historyService = {
   downloadStem: async (song: SongStems) => {
     try {
       const songDir = new Directory(Cache, "songs");
-      if (!songDir.exists) {
+      if (await !songDir.exists) {
         songDir.create({ intermediates: true });
       }
-      const zipFile = new File(Cache, song.id + ".zip");
-      const file = await File.downloadFileAsync(
-        APIUrl + "/download/" + song.id,
-        zipFile
-      );
-      //EOF
-      //unzip func
-      if (file.exists) {
-        const stemDir = new Directory(songDir, song.id);
-        await unzip(file.uri, stemDir.uri)
-          .then((path) => {
-            console.log(`Décompression réussie dans: ${path}`);
-            console.log("taille: ", stemDir.size);
-            // Affiche le nom de tous les fichiers contenus dans stemDir
-            const filesInStemDir = new Directory(stemDir, song.id).list();
-            const stemFiles: StemFile[] = [];
-            filesInStemDir.forEach((f: any) => {
-              const file: StemFile = {
-                name: f.name,
-                duration: 475678758, //to change when i will implement audioservice
-                uri: f.uri,
-                format: f.name.split(".").pop()?.toLowerCase() || "unknown",
-              };
-
-              stemFiles.push(file);
-            });
-            // console.log(
-            //   "songDir files:",
-            //   stemFiles.map((f) => f.name)
-            // );
-            const updatedSong: SongStems = { ...song, stems: stemFiles };
-            console.log(updatedSong);
-            historyService.updateHistoryItem(updatedSong);
-            zipFile.delete();
-          })
-          .catch((err: any) => {
-            console.error("Erreur unzip:", err);
-          });
-      }
-      //EOF
-      else {
-        console.log("erreur lors du telechargement");
+      // Vérifie si le fichier existe déjà
+      if (Array.isArray(song.stems) && song.stems.length > 0) {
+        const firstStem = new File(song.stems[0].uri);
+        if (await firstStem.exists) {
+          console.log(`⚠️ Le dossier ${song.title} existe déjà.`);
+        } else {
+          const zipFile = new File(Cache, song.id + ".zip");
+          if (await zipFile.exists) {
+            console.log(
+              `⚠️ Le fichier ${zipFile.name} existe déjà, téléchargement ignoré.`
+            );
+          } else {
+            console.log(`⬇️ Téléchargement de ${zipFile.name}...`);
+            await File.downloadFileAsync(
+              APIUrl + "/download/" + song.id,
+              zipFile
+            );
+            console.log("✅ Téléchargement terminé :", zipFile.uri);
+            console.log("dezipage...");
+            await historyService.unzipFile(zipFile, song);
+          }
+        }
       }
     } catch (e: any) {
       console.error("exception: ", e.message);
     }
+  },
+  unzipFile: async (file: File, song: SongStems) => {
+    const stemDir = new Directory(new Directory(Cache, "songs"), song.id);
+    await unzip(file.uri, stemDir.uri)
+      .then((path) => {
+        console.log(`Décompression réussie dans: ${path}`);
+        console.log("taille: ", stemDir.size);
+        file.delete();
+        // Affiche le nom de tous les fichiers contenus dans stemDir
+        const filesInStemDir = new Directory(stemDir, song.id).list();
+        const stemFiles: StemFile[] = [];
+        filesInStemDir.forEach((f: any) => {
+          const item: StemFile = {
+            name: f.name,
+            duration: 475678758, //to change when i will implement audioservice
+            uri: f.uri,
+            format: f.name.split(".").pop()?.toLowerCase() || "unknown",
+          };
+
+          stemFiles.push(item);
+        });
+
+        const updatedSong: SongStems = { ...song, stems: stemFiles };
+        console.log(updatedSong);
+        historyService.updateHistoryItem(updatedSong);
+      })
+      .catch((err: any) => {
+        console.error("Erreur unzip:", err);
+      });
   },
 };
 

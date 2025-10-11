@@ -1,7 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import { apiRequest } from "./request";
 
-const BaseUrl = "http://10.134.142.87:3000";
 
 // tester si la connexion au serveur est etablie f
 const Params = {};

@@ -7,6 +7,7 @@ import { GlobalStyles, MainColor } from "../style/global.style";
 import { Download } from "lucide-react-native";
 import stemTile from "../components/stemTile";
 import StemTile from "../components/stemTile";
+import Player from "../components/Player";
 
 // create a component
 const PlayerScreen = () => {
@@ -17,8 +18,10 @@ const PlayerScreen = () => {
       {selectedSong ? (
         <View
           style={{
-            width: "90%",
+            width: "100%",
             display: "flex",
+            height: "100%",
+            paddingTop: "20%",
             flexDirection: "column",
             justifyContent: "space-between",
             alignItems: "center",
@@ -26,17 +29,17 @@ const PlayerScreen = () => {
         >
           <View
             style={{
-              width: "100%",
+              width: "90%",
               display: "flex",
               flexDirection: "row",
-              justifyContent: "center",
+              justifyContent: "space-between",
               // backgroundColor: MainColor.AccentColor,
               alignItems: "center",
             }}
           >
             <View
               style={{
-                width: "70%",
+                width: "80%",
                 display: "flex",
                 flexDirection: "row",
                 justifyContent: "space-between",
@@ -64,10 +67,20 @@ const PlayerScreen = () => {
               </View>
             </TouchableOpacity>
           </View>
-
-          {selectedSong.stems.map((item) => (
-            <StemTile key={item.name} file={item} />
-          ))}
+          <View
+            style={{
+              width: "90%",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            {selectedSong.stems.map((item) => (
+              <StemTile key={item.name} file={item} />
+            ))}
+          </View>
+          <Player audioSources={selectedSong.stems} />
         </View>
       ) : (
         <Text style={GlobalStyles.Large_text}>"no song loaded"</Text>
@@ -82,7 +95,9 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+
     backgroundColor: MainColor.bgColor,
+    height: "100%",
   },
 });
 
