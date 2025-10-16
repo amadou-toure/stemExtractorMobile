@@ -38,12 +38,11 @@ const HistoryScreen = () => {
   useEffect(() => {
     historyService.readHistory().then((history: SongStems[]) => {
       setData(history);
-
       history.forEach((element) => {
         checkStatus(element); // 🔹 On appelle bien la fonction ici
       });
     });
-  }, []);
+  }, [historyService.readHistory]);
 
   const renderItem = ({ item }: { item: any }) => (
     <View

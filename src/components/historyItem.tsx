@@ -38,7 +38,7 @@ const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
     } else {
       await historyService.downloadStem(song).then(() => {
         setSelectedSong(song);
-
+        console.log("song: ", song);
         navigator.navigate(`player`);
       });
     }

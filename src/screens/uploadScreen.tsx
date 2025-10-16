@@ -1,4 +1,4 @@
-//import liraries
+ //import liraries
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { GlobalStyles, MainColor } from "../style/global.style";

@@ -8,7 +8,7 @@ import { apiClient } from "./apiClient";
 const AppDirectory = new Directory(Paths.document, "Unmix");
 const Cache = new Directory(Paths.cache);
 
-const APIUrl = "http://192.168.2.20:3000";
+const APIUrl = "http://10.222.42.87:3000";
 export const historyService = {
   initHistoryFile: async () => {
     try {
@@ -93,82 +93,97 @@ export const historyService = {
       console.error("Erreur suppression:", e);
     }
   },
+
   downloadStem: async (song: SongStems) => {
     try {
-      const songDir = new Directory(Cache, "songs");
-      if (await !songDir.exists) {
-        songDir.create({ intermediates: true });
-      }
-      // Vérifie si le fichier existe déjà
-      if (Array.isArray(song.stems) && song.stems.length > 0) {
+      const zipFile = new File(Cache, song.id + ".zip");
+      const hasStems = Array.isArray(song.stems) && song.stems.length > 0;
+
+      // Vérifie si un stem déjà présent sur le disque existe
+      if (hasStems) {
         const firstStem = new File(song.stems[0].uri);
         if (await firstStem.exists) {
-          console.log(`⚠️ Le dossier ${song.title} existe déjà.`);
-        } else {
-          const zipFile = new File(Cache, song.id + ".zip");
-          if (await zipFile.exists) {
-            console.log(
-              `⚠️ Le fichier ${zipFile.name} existe déjà, téléchargement ignoré.`
-            );
-          } else {
-            console.log(`⬇️ Téléchargement de ${zipFile.name}...`);
-            await File.downloadFileAsync(
-              APIUrl + "/download/" + song.id,
-              zipFile
-            );
-            console.log("✅ Téléchargement terminé :", zipFile.uri);
-            console.log("dezipage...");
-            await historyService.unzipFile(zipFile, song);
-          }
+          console.log(
+            `⚠️ Le dossier ${song.title} existe déjà, aucune action nécessaire.`
+          );
+          return;
         }
       }
-    } catch (e: any) {
-      console.error("exception: ", e.message);
+
+      // Vérifie si le zip existe déjà
+      if (await zipFile.exists) {
+        console.log(
+          `⚠️ Le fichier ${zipFile.name} existe déjà, décompression en cours...`
+        );
+      } else {
+        console.log(`⬇️ Téléchargement de ${zipFile.name}...`);
+        await File.downloadFileAsync(`${APIUrl}/download/${song.id}`, zipFile);
+        console.log("✅ Téléchargement terminé :", zipFile.uri);
+      }
+
+      // Décompression du zip
+      console.log("🧩 Décompression du fichier...");
+      await historyService.unzipFile(zipFile, song);
+    } catch (e) {
+      console.error("❌ Erreur dans downloadStem:", e);
     }
   },
   unzipFile: async (file: File, song: SongStems) => {
-    const stemDir = new Directory(new Directory(Cache, "songs"), song.id);
-    await unzip(file.uri, stemDir.uri)
-      .then((path) => {
-        console.log(`Décompression réussie dans: ${path}`);
-        console.log("taille: ", stemDir.size);
-        file.delete();
-        // Affiche le nom de tous les fichiers contenus dans stemDir
-        const filesInStemDir = new Directory(stemDir, song.id).list();
-        const stemFiles: StemFile[] = [];
-        filesInStemDir.forEach((f: any) => {
-          const item: StemFile = {
-            name: f.name,
-            duration: 475678758, //to change when i will implement audioservice
-            uri: f.uri,
-            format: f.name.split(".").pop()?.toLowerCase() || "unknown",
-          };
+    try {
+      // Vérifications de base
+      const zipExists = await file.exists;
+      console.log("zip exists?", zipExists, "uri:", file?.uri);
+      if (!zipExists || !file?.uri) {
+        throw new Error("Zip introuvable ou URI invalide");
+      }
 
-          stemFiles.push(item);
-        });
+      // Prépare les dossiers: /cache/songs/<song.id>
+      const songsDir = new Directory(Cache, "songs");
+      if (!(await songsDir.exists)) {
+        console.log("Création du dossier songs...");
+        await songsDir.create({ intermediates: true });
+      }
 
-        const updatedSong: SongStems = { ...song, stems: stemFiles };
-        console.log(updatedSong);
-        historyService.updateHistoryItem(updatedSong);
-      })
-      .catch((err: any) => {
-        console.error("Erreur unzip:", err);
-      });
+      const stemDir = new Directory(songsDir, song.id);
+      if (await stemDir.exists) {
+        // Nettoyage pour éviter les résidus d'une précédente décompression
+        console.log("🧹 Dossier déjà présent, suppression...");
+        await stemDir.delete();
+      }
+      await stemDir.create({ intermediates: true });
+      console.log("Décompression vers:", stemDir.uri);
+
+      // Android: le module natif préfère les chemins sans "file://"
+      const zipPath = file.uri.replace("file://", "");
+      const destPath = stemDir.uri.replace("file://", "");
+
+      // Décompression
+      const outPath = await unzip(zipPath, destPath);
+      console.log(`✅ Décompression réussie: ${outPath}`);
+
+      // Nettoyage du zip
+      await file.delete();
+
+      // Listing des fichiers décompressés
+      const filesInStemDir = await new Directory(stemDir, song.id).list();
+      const stemFiles: StemFile[] = filesInStemDir.map((f: any) => ({
+        name: f.name,
+        duration: 0, // sera calculé plus tard
+        uri: f.uri,
+        format: f.name.split(".").pop()?.toLowerCase() || "unknown",
+      }));
+
+      // Mise à jour de l'historique
+      const updatedSong: SongStems = { ...song, stems: stemFiles };
+      console.log(
+        "Mise à jour historique pour:",
+        updatedSong.id,
+        stemFiles.length,
+        "fichiers"
+      );
+      await historyService.updateHistoryItem(updatedSong);
+    } catch (e) {
+      console.error("Erreur unzipFile:", e);
+    }
   },
 };
-
-// const newSong = {
-//   id: "7",
-//   status: "done",
-//   song: {
-//     title: "Numb",
-//     artist: "Linkin Park",
-//     stems: [
-//       { stemType: "vocals", uri: "file:///.../vocals.wav", duration: "03:05" },
-//       { stemType: "drums", uri: "file:///.../drums.wav", duration: "03:05" },
-//     ],
-//   },
-//   createdAt: new Date().toISOString(),
-// };
-
-// await addHistoryItem(newSong);

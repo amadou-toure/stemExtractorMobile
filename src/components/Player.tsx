@@ -1,5 +1,5 @@
 //import liraries
-import React, { Component, useState } from "react";
+import React, { Component, useEffect, useState } from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { GlobalStyles, MainColor } from "../style/global.style";
 import { Slider } from "@rneui/themed";
@@ -10,6 +10,12 @@ import { StemFile } from "../types/types";
 // create a component
 const Player = ({ audioSources }: { audioSources: StemFile[] }) => {
   const [value, setValue] = useState(0);
+  console.log("audioSources: ", audioSources[0].uri.replace("file://", ""));
+  const player = useAudioPlayer(audioSources[0].uri.replace("file://", ""));
+  useEffect(() => {
+    player.play();
+    console.log("playing... ", player.playing);
+  }, [audioSources]);
 
   return (
     <View style={styles.container}>
