@@ -12,7 +12,7 @@ import { UnmixService } from "../services/unmixService";
 
 // create a component
 const HistoryScreen = () => {
-  const navigator = useNavigation();
+  const navigator: any = useNavigation();
 
   const [data, setData] = useState<SongStems[]>([]);
   const checkStatus = async (item: SongStems) => {

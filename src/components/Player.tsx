@@ -1,21 +1,82 @@
 //import liraries
 import React, { Component, useEffect, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { GlobalStyles, MainColor } from "../style/global.style";
 import { Slider } from "@rneui/themed";
-import { Play, SkipBack, SkipForward } from "lucide-react-native";
+import {
+  Play,
+  RotateCcw,
+  RotateCw,
+  SkipBack,
+  SkipForward,
+} from "lucide-react-native";
 import { useAudioPlayer } from "expo-audio";
 import { StemFile } from "../types/types";
 
-// create a component
+// Helper function to format time in mm:ss
+const formatTime = (duration: number): string => {
+  if (!duration || isNaN(duration)) return "00:00";
+  const minutes = Math.floor(duration / 60);
+  const seconds = Math.floor(duration % 60);
+  const formattedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
+  const formattedSeconds = seconds < 10 ? `0${seconds}` : `${seconds}`;
+  return `${formattedMinutes}:${formattedSeconds}`;
+};
+
 const Player = ({ audioSources }: { audioSources: StemFile[] }) => {
-  const [value, setValue] = useState(0);
-  console.log("audioSources: ", audioSources[0].uri.replace("file://", ""));
-  const player = useAudioPlayer(audioSources[0].uri.replace("file://", ""));
+  const Bassplayer = useAudioPlayer({
+    uri: audioSources[0].uri.replace("file://", ""),
+  });
+  const Otherplayer = useAudioPlayer({
+    uri: audioSources[2].uri.replace("file://", ""),
+  });
+  const Drumplayer = useAudioPlayer({
+    uri: audioSources[1].uri.replace("file://", ""),
+  });
+  const Voiceplayer = useAudioPlayer({
+    uri: audioSources[3].uri.replace("file://", ""),
+  });
+  const PlayAll = () => {
+    Bassplayer.play();
+    Otherplayer.play();
+    Drumplayer.play();
+    Voiceplayer.play();
+  };
+  const PauseAll = () => {
+    Bassplayer.pause();
+    Otherplayer.pause();
+    Drumplayer.pause();
+    Voiceplayer.pause();
+  };
+  const SeekAll = (val: number) => {
+    PauseAll();
+    Bassplayer.seekTo(val);
+    Otherplayer.seekTo(val);
+    Drumplayer.seekTo(val);
+    Voiceplayer.seekTo(val);
+    PlayAll();
+  };
+  const handlePlayButton = () => {
+    PlayAll();
+  };
+  const handleSkipBackButton = () => {
+    SeekAll(position - 5);
+  };
+  const handleSkipForwardButton = () => {
+    SeekAll(position + 5);
+  };
+  const [position, setPosition] = useState(0);
   useEffect(() => {
-    player.play();
-    console.log("playing... ", player.playing);
-  }, [audioSources]);
+    const interval = setInterval(() => {
+      setPosition((prev) => {
+        if (Bassplayer.playing) {
+          return Bassplayer.currentTime;
+        }
+        return prev;
+      });
+    }, 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -28,15 +89,19 @@ const Player = ({ audioSources }: { audioSources: StemFile[] }) => {
           width: "90%",
         }}
       >
-        <Text style={GlobalStyles.Secondary_text}>00:00</Text>
-        <Text style={GlobalStyles.Secondary_text}>05:00</Text>
+        <Text style={GlobalStyles.Secondary_text}>{formatTime(position)}</Text>
+        <Text style={GlobalStyles.Secondary_text}>
+          {formatTime(Bassplayer.duration)}
+        </Text>
       </View>
 
       <Slider
-        value={value}
-        onValueChange={setValue}
+        value={Bassplayer.currentTime}
+        onValueChange={(val) => {
+          SeekAll(val);
+        }}
         minimumValue={0}
-        maximumValue={10}
+        maximumValue={Bassplayer.duration || 1}
         minimumTrackTintColor={MainColor.AccentColor}
         maximumTrackTintColor={MainColor.InactiveTextColor}
         style={{ width: "90%", alignSelf: "center" }}
@@ -57,15 +122,26 @@ const Player = ({ audioSources }: { audioSources: StemFile[] }) => {
           width: "70%",
         }}
       >
-        <SkipBack
-          style={{ width: 40, height: 40 }}
-          color={MainColor.ButtonColor}
-        />
-        <Play style={{ width: 40, height: 40 }} color={MainColor.ButtonColor} />
-        <SkipForward
-          style={{ width: 40, height: 40 }}
-          color={MainColor.ButtonColor}
-        />
+        <TouchableOpacity onPress={handleSkipBackButton}>
+          <RotateCcw
+            style={{ width: 40, height: 40 }}
+            color={MainColor.ButtonColor}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={handlePlayButton}>
+          <Play
+            style={{ width: 40, height: 40 }}
+            color={MainColor.ButtonColor}
+          />
+        </TouchableOpacity>
+
+        <TouchableOpacity onPress={handleSkipForwardButton}>
+          <RotateCw
+            style={{ width: 40, height: 40 }}
+            color={MainColor.ButtonColor}
+          />
+        </TouchableOpacity>
       </View>
     </View>
   );

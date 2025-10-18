@@ -43,7 +43,7 @@ const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
       });
     }
   };
-  const navigator = useNavigation();
+  const navigator: any = useNavigation();
   const RenderIcon: React.FC<RenderIconProps> = ({ iconName, size, color }) => {
     let InstrumentIcon: any = null;
     if (iconName === "Guitar") {
