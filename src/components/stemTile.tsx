@@ -1,15 +1,32 @@
 //import liraries
 import React, { Component, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { StemFile } from "../types/types";
 import { GlobalStyles, MainColor } from "../style/global.style";
-import { AudioLines, Drum, Mic, Speaker, Volume2 } from "lucide-react-native";
+import {
+  AudioLines,
+  Drum,
+  Mic,
+  Speaker,
+  Volume2,
+  VolumeOff,
+} from "lucide-react-native";
 //import Slider from "@react-native-community/slider";
 import { Slider } from "@rneui/themed";
+import { useSelectedSong } from "../../context/selectedSnongContext";
 
 // create a component
-const StemTile = ({ file }: { file: StemFile }) => {
-  const [value, setValue] = useState(0);
+const StemTile = ({
+  file,
+  volume,
+  setVolume,
+}: {
+  file: StemFile;
+  volume: number;
+  setVolume: React.Dispatch<React.SetStateAction<number>>;
+}) => {
+  const [isMuted, setMute] = useState(false);
+
   return (
     <View style={styles.container}>
       <View
@@ -55,10 +72,10 @@ const StemTile = ({ file }: { file: StemFile }) => {
           <Text style={GlobalStyles.Large_text}>{file.name}</Text>
           <Slider
             //style={{ width: "100%" }}
-            value={value}
-            onValueChange={setValue}
-            minimumValue={0}
-            maximumValue={10}
+            value={volume}
+            onValueChange={setVolume}
+            minimumValue={0.0001}
+            maximumValue={1.0}
             minimumTrackTintColor={MainColor.AccentColor}
             maximumTrackTintColor={MainColor.InactiveTextColor}
             style={{ width: "100%", alignSelf: "center" }}
@@ -71,7 +88,7 @@ const StemTile = ({ file }: { file: StemFile }) => {
             }}
           />
         </View>
-        <View
+        <TouchableOpacity
           style={{
             display: "flex",
             flexDirection: "column",
@@ -80,9 +97,22 @@ const StemTile = ({ file }: { file: StemFile }) => {
             // backgroundColor: MainColor.InactiveTextColor,
             width: "15%",
           }}
+          onPress={() => {
+            if (isMuted) {
+              setMute(false);
+              setVolume(0.0001);
+            } else {
+              setMute(true);
+              setVolume(1);
+            }
+          }}
         >
-          <Volume2 color={MainColor.ButtonColor} />
-        </View>
+          {isMuted ? (
+            <Volume2 color={MainColor.ButtonColor} />
+          ) : (
+            <VolumeOff color={MainColor.ButtonColor} />
+          )}
+        </TouchableOpacity>
       </View>
     </View>
   );

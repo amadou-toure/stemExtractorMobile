@@ -156,36 +156,52 @@ export const SelectedSongProvider = ({ children }: { children: ReactNode }) => {
   }, [Bassplayer]);
 
   useEffect(() => {
-    if (Bassplayer && typeof BassVolume === "number") {
+    if (!Bassplayer) return;
+    if (BassVolume <= 0.0002) {
+      Bassplayer.muted = true;
+    } else {
+      Bassplayer.muted = false;
       Bassplayer.volume = BassVolume;
     }
-  }, [BassVolume]);
+  }, [BassVolume, Bassplayer]);
 
   useEffect(() => {
-    if (Drumplayer && typeof DrumsVolume === "number") {
+    if (!Drumplayer) return;
+    if (DrumsVolume <= 0.0002) {
+      Drumplayer.muted = true;
+    } else {
+      Drumplayer.muted = false;
       Drumplayer.volume = DrumsVolume;
     }
   }, [DrumsVolume, Drumplayer]);
 
   useEffect(() => {
-    if (Voiceplayer && typeof VocalsVolume === "number") {
+    if (!Voiceplayer) return;
+    if (VocalsVolume <= 0.0002) {
+      Voiceplayer.muted = true;
+    } else {
+      Voiceplayer.muted = false;
       Voiceplayer.volume = VocalsVolume;
     }
   }, [VocalsVolume, Voiceplayer]);
 
   useEffect(() => {
-    if (Otherplayer && typeof OtherVolume === "number") {
+    if (!Otherplayer) return;
+    if (OtherVolume <= 0.0002) {
+      Otherplayer.muted = true;
+    } else {
+      Otherplayer.muted = false;
       Otherplayer.volume = OtherVolume;
     }
   }, [OtherVolume, Otherplayer]);
 
   useEffect(() => {
-    if (Guitarplayer && typeof GuitarVolume === "number") {
-      try {
-        Guitarplayer.volume = GuitarVolume;
-      } catch (error) {
-        console.warn("Guitarplayer non disponible ou libéré :", error);
-      }
+    if (!Guitarplayer) return;
+    if (GuitarVolume <= 0.0002) {
+      Guitarplayer.muted = true;
+    } else {
+      Guitarplayer.muted = false;
+      Guitarplayer.volume = GuitarVolume;
     }
   }, [GuitarVolume, Guitarplayer]);
 

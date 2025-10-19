@@ -3,7 +3,7 @@ import React, { Component, useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { GlobalStyles, MainColor } from "../style/global.style";
 import { Slider } from "@rneui/themed";
-import { Play, RotateCcw, RotateCw } from "lucide-react-native";
+import { Pause, Play, RotateCcw, RotateCw } from "lucide-react-native";
 
 import { useSelectedSong } from "../../context/selectedSnongContext";
 
@@ -18,7 +18,8 @@ const formatTime = (duration: number): string => {
 };
 
 const Player = () => {
-  const { position, duration, SeekAll, PlayAll } = useSelectedSong();
+  const [isPaused, setIsPaused] = useState(true);
+  const { position, duration, SeekAll, PlayAll, PauseAll } = useSelectedSong();
   return (
     <View style={styles.container}>
       <View
@@ -63,7 +64,7 @@ const Player = () => {
       >
         <TouchableOpacity
           onPress={() => {
-            SeekAll(position - 3);
+            SeekAll(position - 10);
           }}
         >
           <RotateCcw
@@ -72,16 +73,33 @@ const Player = () => {
           />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={PlayAll}>
-          <Play
-            style={{ width: 40, height: 40 }}
-            color={MainColor.ButtonColor}
-          />
+        <TouchableOpacity
+          onPress={() => {
+            if (isPaused) {
+              PlayAll();
+              setIsPaused(false);
+            } else {
+              PauseAll();
+              setIsPaused(true);
+            }
+          }}
+        >
+          {isPaused ? (
+            <Play
+              style={{ width: 40, height: 40 }}
+              color={MainColor.ButtonColor}
+            />
+          ) : (
+            <Pause
+              style={{ width: 40, height: 40 }}
+              color={MainColor.ButtonColor}
+            />
+          )}
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={() => {
-            SeekAll(position + 3);
+            SeekAll(position + 10);
           }}
         >
           <RotateCw

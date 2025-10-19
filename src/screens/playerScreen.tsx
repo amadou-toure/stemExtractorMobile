@@ -11,7 +11,18 @@ import Player from "../components/Player";
 
 // create a component
 const PlayerScreen = () => {
-  const { setSelectedSong, selectedSong } = useSelectedSong();
+  const {
+    setSelectedSong,
+    selectedSong,
+    BassVolume,
+    setBassVolume,
+    VocalsVolume,
+    setVocalsVolume,
+    DrumsVolume,
+    setDrumsVolume,
+    OtherVolume,
+    setOtherVolume,
+  } = useSelectedSong();
 
   return (
     <View style={styles.container}>
@@ -76,9 +87,43 @@ const PlayerScreen = () => {
               alignItems: "center",
             }}
           >
-            {selectedSong.stems.map((item) => (
-              <StemTile key={item.name} file={item} />
-            ))}
+            {selectedSong.stems.map((item) => {
+              let volume = 1;
+              let setVolume: React.Dispatch<
+                React.SetStateAction<number>
+              > = () => {};
+
+              switch (item.name) {
+                case "bass.wav":
+                  volume = BassVolume;
+                  setVolume = setBassVolume;
+                  break;
+                case "vocals.wav":
+                  volume = VocalsVolume;
+                  setVolume = setVocalsVolume;
+                  break;
+                case "drums.wav":
+                  volume = DrumsVolume;
+                  setVolume = setDrumsVolume;
+                  break;
+                case "other.wav":
+                  volume = OtherVolume;
+                  setVolume = setOtherVolume;
+                  break;
+                default:
+                  console.warn(`Aucun volume associé pour ${item.name}`);
+              }
+              console.log(item.name, ": ", volume);
+
+              return (
+                <StemTile
+                  key={item.name}
+                  file={item}
+                  volume={volume}
+                  setVolume={setVolume}
+                />
+              );
+            })}
           </View>
           <Player />
         </View>
