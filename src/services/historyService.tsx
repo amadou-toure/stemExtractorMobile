@@ -12,7 +12,6 @@ const APIUrl = "http://10.222.42.87:3000";
 export const historyService = {
   initHistoryFile: async () => {
     try {
-      Cache.delete;
       if (!AppDirectory.exists) {
         await AppDirectory.create({ intermediates: true });
       }
@@ -51,7 +50,6 @@ export const historyService = {
     const HISTORY_FILE = new File(AppDirectory, "history.json");
     history.push(newItem);
     await HISTORY_FILE.write(JSON.stringify(history, null, 2));
-    console.log(await historyService.readHistory());
   },
   updateHistoryItem: async (updatedItem: SongStems) => {
     try {
@@ -84,6 +82,7 @@ export const historyService = {
     const HISTORY_FILE = new File(AppDirectory, "history.json");
     const updated = history.filter((item: any) => item.id !== id);
     HISTORY_FILE.write(JSON.stringify(updated, null, 2));
+    historyService.readHistory();
   },
   deleteHistoryItem: async () => {
     try {

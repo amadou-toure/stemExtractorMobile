@@ -2,9 +2,9 @@
 import React, { Component, useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { GlobalStyles, MainColor } from "../style/global.style";
-//import { Slider } from "@rneui/themed";
+
 import Slider from "@react-native-community/slider";
-//import { Slider } from "@expo/ui/jetpack-compose";
+
 import { Pause, Play, RotateCcw, RotateCw } from "lucide-react-native";
 
 import { useSelectedSong } from "../../context/selectedSnongContext";

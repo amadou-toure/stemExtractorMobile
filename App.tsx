@@ -17,12 +17,13 @@ import {
 } from "./context/selectedSnongContext";
 import LoadingScreen from "./src/components/loadingScreen";
 import { historyService } from "./src/services/historyService";
+import { useEffect } from "react";
 
 export default function Root() {
-  const init = async () => {
+  useEffect(() => {
     historyService.initHistoryFile();
-  };
-  init();
+  }, []);
+
   return (
     <LoadingProvider>
       <SelectedSongProvider>

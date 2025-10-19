@@ -133,6 +133,7 @@ const GlobalStyles = StyleSheet.create({
   circularButton: {
     backgroundColor: MainColor.AccentColor,
     borderRadius: 100,
+
     padding: 5,
   },
 });

@@ -1,5 +1,5 @@
 //import liraries
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 import {
   View,
   Text,
@@ -18,6 +18,9 @@ import {
   Calendar,
   Clock,
   Music2Icon,
+  Download,
+  Trash,
+  SquareX,
 } from "lucide-react-native";
 import { RenderIconProps, SongStems, StemFile } from "../types/types";
 import { useNavigation } from "@react-navigation/native";
@@ -26,19 +29,45 @@ import { historyService } from "../services/historyService";
 import { UnmixService } from "../services/unmixService";
 import { useLoading } from "../../context/loadingContext";
 import { useSelectedSong } from "../../context/selectedSnongContext";
+import CustomModal from "./CustomModal";
+import CustomToast from "./CustomToast";
 
 // create a component
 
 const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
   const { setLoading } = useLoading();
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
   const { setSelectedSong } = useSelectedSong();
+  const [isVisible, setVisible] = useState(false);
+  const [isConfimationModalVisible, setConfimationModalVisible] =
+    useState(false);
+
+  const handleLongPress = () => {
+    setVisible(true);
+  };
+
+  const handleDownload = () => {
+    console.log("download");
+    setVisible(false);
+  };
+  const handleDelete = async () => {
+    console.log("delete");
+    setToastMessage(`${song.title} supprimer avec succes !`);
+    await historyService.removeHistoryItem(song.id);
+    setVisible(false);
+    setToastVisible(true);
+  };
+
   const handlePress = async () => {
     if (status != "done") {
-      Alert.alert("pending", "unmixing is pending");
+      setToastMessage("Traitement toujours en cours, veuilleiz patienter");
+      setToastVisible(true);
     } else {
+      setToastMessage("chargement du fichier, Veuillez patienter");
+      setToastVisible(true);
       await historyService.downloadStem(song).then(() => {
         setSelectedSong(song);
-        console.log("song: ", song);
         navigator.navigate(`player`);
       });
     }
@@ -61,9 +90,60 @@ const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
   };
 
   return (
-    <TouchableOpacity style={styles.container} onPress={() => handlePress()}>
-      {/* view contenant le titre de la chanson, la duree et la date */}
+    <TouchableOpacity
+      style={styles.container}
+      onLongPress={handleLongPress}
+      onPress={() => handlePress()}
+    >
       <View style={styles.topContainer}>
+        <CustomModal
+          visible={isVisible}
+          onClose={() => setVisible(false)}
+          title="Options de la chanson"
+          options={[
+            {
+              label: " Télécharger",
+              icon: <Download color={MainColor.AccentColor} />,
+              onPress: handleDownload,
+            },
+            {
+              label: " Supprimer",
+              icon: <Trash color={MainColor.AccentColor} />,
+              color: "red",
+              onPress: () => {
+                setVisible(false);
+                setConfimationModalVisible(true);
+              },
+            },
+            {
+              label: " Fermer",
+              icon: <SquareX color={MainColor.AccentColor} />,
+              onPress: () => setVisible(false),
+            },
+          ]}
+        />
+        <CustomModal
+          visible={isConfimationModalVisible}
+          onClose={() => setConfimationModalVisible(false)}
+          title="Voulez vous vraiment supprimer cette chanson ?"
+          options={[
+            {
+              label: "Oui",
+              onPress: handleDelete,
+            },
+            {
+              label: " Annuler",
+              color: MainColor.AccentColor,
+              onPress: () => setConfimationModalVisible(false),
+            },
+          ]}
+        />
+        <CustomToast
+          visible={toastVisible}
+          message={toastMessage}
+          type={"info"}
+          onHide={() => setToastVisible(false)}
+        />
         <View style={styles.titleRow}>
           <View style={styles.iconCircle}>
             <Music2Icon color={MainColor.AccentColor} />

@@ -40,7 +40,12 @@ import React, {
   SetStateAction,
 } from "react";
 import { SongStems, StemFile } from "../src/types/types";
-import { AudioPlayer, useAudioPlayer } from "expo-audio";
+import {
+  AudioPlayer,
+  useAudioPlayer,
+  setAudioModeAsync,
+  setIsAudioActiveAsync,
+} from "expo-audio";
 
 interface SelectedSongContextType {
   selectedSong: SongStems | undefined;
@@ -108,6 +113,7 @@ export const SelectedSongProvider = ({ children }: { children: ReactNode }) => {
         })
       : null;
   const duration = Bassplayer.duration;
+
   const PlayAll = () => {
     Bassplayer.play();
     Otherplayer.play();

@@ -43,9 +43,11 @@
       "supportsTablet": true,
       "bundleIdentifier": "com.nanfahwa.mobileDemucs",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "UIBackgroundModes": ["audio"]
       }
     },
+
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
@@ -53,7 +55,9 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.nanfahwa.mobileDemucs"
+      "package": "com.nanfahwa.mobileDemucs",
+      "permissions": ["WAKE_LOCK"],
+      "playSoundInBackground": true
     },
     "web": {
       "bundler": "metro",

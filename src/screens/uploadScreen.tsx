@@ -1,4 +1,4 @@
- //import liraries
+//import liraries
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { GlobalStyles, MainColor } from "../style/global.style";
@@ -8,10 +8,13 @@ import { useLoading } from "../../context/loadingContext";
 import { UnmixService } from "../services/unmixService";
 import { SongStems } from "../types/types";
 import { historyService } from "../services/historyService";
+import CustomToast from "../components/CustomToast";
 
 // create a component
 const UploadScreen = () => {
   const { setLoading } = useLoading();
+  const [visble, setVisible] = useState(false);
+  const [message, setMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState<{
     uri: string;
     name: string;
@@ -64,9 +67,13 @@ const UploadScreen = () => {
       };
       historyService.addHistoryItem(newSongStem);
 
+      setMessage(`${newSongStem.title} uploaded successfully`);
+      setVisible(true);
       setSelectedFile(null);
     } catch {
-      // error handling omitted for brevity
+      setMessage(`error durring uploading`);
+      setVisible(true);
+      setSelectedFile(null);
     } finally {
       setLoading(false);
     }
@@ -96,6 +103,12 @@ const UploadScreen = () => {
           </Text>
         </TouchableOpacity>
       )}
+      <CustomToast
+        visible={visble}
+        message={message}
+        type={"info"}
+        onHide={() => setVisible(false)}
+      />
     </View>
   );
 };

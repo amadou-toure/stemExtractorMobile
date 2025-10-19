@@ -1,48 +1,79 @@
 //import liraries
 
 import { useState, useEffect } from "react";
-import { View, TouchableOpacity, FlatList } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { View, TouchableOpacity, FlatList, Text } from "react-native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { GlobalStyles, MainColor } from "../style/global.style";
 import { Plus, SquareDashed } from "lucide-react-native";
 import HistoryItem from "../components/historyItem";
 import { SongStems } from "../types/types";
 import { historyService } from "../services/historyService";
 import { UnmixService } from "../services/unmixService";
+import CustomToast from "../components/CustomToast";
 
 // create a component
 const HistoryScreen = () => {
   const navigator: any = useNavigation();
 
   const [data, setData] = useState<SongStems[]>([]);
-  const checkStatus = async (item: SongStems) => {
-    if (item.status === "processing") {
+  const [toastVisible, setToastVisible] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastType, setToastType] = useState<"success" | "error" | "info">(
+    "info"
+  );
+
+  // const checkStatus = async (item: SongStems) => {
+  //   if (item.status === "processing") {
+  //     const response = await UnmixService.CheckStatus(item.id);
+  //     const status = response.data;
+  //     const interval = setInterval(async () => {
+  //       if (status === "done" || status === "not_found") {
+  //         setData((prevData) =>
+  //           prevData.map((d) =>
+  //             d.id === item.id ? { ...d, status: "done" } : d
+  //           )
+  //         );
+  //         clearInterval(interval);
+  //       } else {
+  //         console.log(status);
+  //       }
+  //     }, 5000);
+  //     return () => clearInterval(interval);
+  //   }
+  // };
+  const pollingIds = new Set<string>();
+
+  const checkStatus = (item: SongStems) => {
+    if (item.status !== "processing" || pollingIds.has(item.id)) return;
+    pollingIds.add(item.id);
+
+    const interval = setInterval(async () => {
       const response = await UnmixService.CheckStatus(item.id);
       const status = response.data;
-      const interval = setInterval(async () => {
-        if (status === "done" || status === "not_found") {
-          setData((prevData) =>
-            prevData.map((d) =>
-              d.id === item.id ? { ...d, status: "done" } : d
-            )
-          );
-          clearInterval(interval);
-        } else {
-          console.log(status);
-        }
-      }, 5000);
-      return () => clearInterval(interval);
-    }
+
+      if (status === "done" || status === "not_found") {
+        setData((prev) =>
+          prev.map((d) => (d.id === item.id ? { ...d, status } : d))
+        );
+        await historyService.updateHistoryItem({
+          ...item,
+          status,
+        });
+
+        clearInterval(interval);
+        pollingIds.delete(item.id);
+      }
+    }, 5000);
   };
 
-  useEffect(() => {
+  useFocusEffect(() => {
     historyService.readHistory().then((history: SongStems[]) => {
       setData(history);
       history.forEach((element) => {
         checkStatus(element); // 🔹 On appelle bien la fonction ici
       });
     });
-  }, [historyService.readHistory]);
+  });
 
   const renderItem = ({ item }: { item: any }) => (
     <View
@@ -79,24 +110,56 @@ const HistoryScreen = () => {
         renderItem={renderItem}
       />
 
+      {/* <TouchableOpacity
+        style={[
+          {
+            position: "absolute",
+            zIndex: 10,
+            left: 10,
+            right: 10,
+            bottom: 70,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          },
+          GlobalStyles.circularButton,
+        ]}
+        onPress={() => {
+          setToastMessage("Ceci est un message de test");
+          setToastType("info");
+          setToastVisible(true);
+        }}
+      >
+        <Text style={{ color: MainColor.SecondaryColor, fontSize: 16 }}>
+          Afficher Toast
+        </Text>
+      </TouchableOpacity> */}
+
       <TouchableOpacity
         style={[
-          { position: "absolute", zIndex: 10, right: 10, bottom: 10 },
+          {
+            position: "absolute",
+            zIndex: 10,
+            left: 10,
+            right: 10,
+            bottom: 10,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          },
           GlobalStyles.circularButton,
         ]}
         onPress={() => navigator.navigate("upload")}
       >
         <Plus color={MainColor.SecondaryColor} size={50} />
       </TouchableOpacity>
-      <TouchableOpacity
-        style={[
-          { position: "absolute", zIndex: 10, left: 10, bottom: 10 },
-          GlobalStyles.circularButton,
-        ]}
-        onPress={() => historyService.deleteHistoryItem()}
-      >
-        <SquareDashed color={MainColor.SecondaryColor} size={50} />
-      </TouchableOpacity>
+
+      <CustomToast
+        visible={toastVisible}
+        message={toastMessage}
+        type={toastType}
+        onHide={() => setToastVisible(false)}
+      />
     </View>
   );
 };
