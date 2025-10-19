@@ -1,9 +1,8 @@
 import { Directory, File, FileInfo, Paths } from "expo-file-system";
 import { ApiResponse, SongStems, StemFile } from "../types/types";
-import { Alert } from "react-native";
+
 import { UnmixService } from "./unmixService";
 import { unzip } from "react-native-zip-archive";
-import { apiClient } from "./apiClient";
 
 const AppDirectory = new Directory(Paths.document, "Unmix");
 const Cache = new Directory(Paths.cache);
@@ -40,7 +39,7 @@ export const historyService = {
       const content = await HISTORY_FILE.text();
       return JSON.parse(content); // retourne un tableau d’objets
     } catch (e) {
-      console.error("Erreur lecture history.json:", e);
+      //
       return [];
     }
   },
@@ -92,6 +91,7 @@ export const historyService = {
       console.error("Erreur suppression:", e);
     }
   },
+  saveStem: async (song: SongStems) => {},
 
   downloadStem: async (song: SongStems) => {
     try {
@@ -103,7 +103,7 @@ export const historyService = {
         const firstStem = new File(song.stems[0].uri);
         if (await firstStem.exists) {
           console.log(
-            `⚠️ Le dossier ${song.title} existe déjà, aucune action nécessaire.`
+            `Le dossier ${song.title} existe déjà, aucune action nécessaire.`
           );
           return;
         }
@@ -112,7 +112,7 @@ export const historyService = {
       // Vérifie si le zip existe déjà
       if (await zipFile.exists) {
         console.log(
-          `⚠️ Le fichier ${zipFile.name} existe déjà, décompression en cours...`
+          ` Le fichier ${zipFile.name} existe déjà, décompression en cours...`
         );
       } else {
         console.log(`⬇️ Téléchargement de ${zipFile.name}...`);

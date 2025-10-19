@@ -7,7 +7,7 @@ import UploadScreen from "./src/screens/uploadScreen";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Upload, Clock, PlayCircle, Settings } from "lucide-react-native";
 import HystoryScreen from "./src/screens/historyScreen";
-import { GlobalStyles, MainColor } from "./src/style/global.style";
+import { GlobalStyles } from "./src/style/global.style";
 import PlayerScreen from "./src/screens/playerScreen";
 import SettingsScreen from "./src/screens/settingsScreen";
 import { LoadingProvider, useLoading } from "./context/loadingContext";
@@ -18,6 +18,10 @@ import {
 import LoadingScreen from "./src/components/loadingScreen";
 import { historyService } from "./src/services/historyService";
 import { useEffect } from "react";
+import {
+  SelectedThemeProvider,
+  useSelectedTheme,
+} from "./context/selectedThemeContext";
 
 export default function Root() {
   useEffect(() => {
@@ -25,17 +29,20 @@ export default function Root() {
   }, []);
 
   return (
-    <LoadingProvider>
-      <SelectedSongProvider>
-        <App />
-      </SelectedSongProvider>
-    </LoadingProvider>
+    <SelectedThemeProvider>
+      <LoadingProvider>
+        <SelectedSongProvider>
+          <App />
+        </SelectedSongProvider>
+      </LoadingProvider>
+    </SelectedThemeProvider>
   );
 }
 
 function App() {
   const Tab = createBottomTabNavigator();
   const { loading } = useLoading();
+  const { selectedTheme } = useSelectedTheme();
 
   return (
     <NavigationContainer>
@@ -44,7 +51,7 @@ function App() {
         <View
           style={[
             GlobalStyles.container,
-            { backgroundColor: MainColor.bgColor },
+            { backgroundColor: selectedTheme.bgColor },
           ]}
         >
           <LoadingScreen type="loading" />
@@ -71,16 +78,16 @@ function App() {
               alignItems: "center",
             },
             tabBarStyle: {
-              backgroundColor: MainColor.tabBarColor,
+              backgroundColor: selectedTheme.tabBarColor,
               height: 70,
               display: "flex",
               flexDirection: "row",
               //alignItems: "center",
               justifyContent: "center",
             },
-            tabBarActiveTintColor: MainColor.AccentColor,
+            tabBarActiveTintColor: selectedTheme.AccentColor,
             headerShown: false,
-            tabBarInactiveTintColor: MainColor.InactiveTextColor,
+            tabBarInactiveTintColor: selectedTheme.InactiveTextColor,
           })}
         >
           <Tab.Screen name="history" component={HystoryScreen} />

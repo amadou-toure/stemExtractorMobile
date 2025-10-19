@@ -1,32 +1,68 @@
-// import React, { createContext, useContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode } from "react";
+import {
+  sunsetJazzTheme,
+  neonPulseTheme,
+  deepOceanTheme,
+  velvetNightTheme,
+  midnightSapphireTheme,
+} from "../src/style/global.style";
 
-// interface SelectedThemeContextType {
-//   selectedTheme:  | undefined;
-//   setSelectedTheme: React.Dispatch<React.SetStateAction<ThemeStems | undefined>>;
-// }
+interface ThemeStems {
+  PrimaryColor: string;
+  SecondaryColor: string;
+  TextColor: string;
+  bgColor: string;
+  [key: string]: string;
+}
 
-// const SelectedThemeContext = createContext<SelectedThemeContextType | undefined>(
-//   undefined
-// );
+interface SelectedThemeContextType {
+  selectedTheme: ThemeStems;
+  setSelectedTheme: React.Dispatch<React.SetStateAction<ThemeStems>>;
+  themes: { [key: string]: ThemeStems };
+}
 
-// export const SelectedThemeProvider = ({ children }: { children: ReactNode }) => {
-//   const [selectedTheme, setSelectedTheme] = useState<ThemeStems | undefined>(
-//     undefined
-//   );
+const themes = {
+  sunsetJazzTheme,
+  neonPulseTheme,
+  deepOceanTheme,
+  velvetNightTheme,
+  midnightSapphireTheme,
+};
 
-//   return (
-//     <SelectedThemeContext.Provider value={{ selectedTheme, setSelectedTheme }}>
-//       {children}
-//     </SelectedThemeContext.Provider>
-//   );
-// };
+const SelectedThemeContext = createContext<SelectedThemeContextType>({
+  selectedTheme: velvetNightTheme,
+  setSelectedTheme: () => {},
+  themes,
+});
 
-// export const useSelectedTheme = (): SelectedThemeContextType => {
-//   const context = useContext(SelectedThemeContext);
-//   if (!context) {
-//     throw new Error(
-//       "useSelectedTheme must be used within a SelectedThemeProvider"
-//     );
-//   }
-//   return context;
-// };
+export const SelectedThemeProvider = ({
+  children,
+}: {
+  children: ReactNode;
+}) => {
+  const [selectedTheme, setSelectedTheme] = useState<ThemeStems>(
+    sunsetJazzTheme // 👈
+  );
+
+  return (
+    <SelectedThemeContext.Provider
+      value={{
+        selectedTheme,
+        setSelectedTheme,
+        themes,
+      }}
+    >
+      {children}
+    </SelectedThemeContext.Provider>
+  );
+};
+
+export const useSelectedTheme = (): SelectedThemeContextType => {
+  const context = useContext(SelectedThemeContext);
+  if (!context) {
+    throw new Error(
+      "useSelectedTheme must be used within a SelectedThemeProvider"
+    );
+  }
+  return context;
+};

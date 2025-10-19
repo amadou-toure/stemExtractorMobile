@@ -8,7 +8,8 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import { GlobalStyles, MainColor } from "../style/global.style";
+import { GlobalStyles } from "../style/global.style";
+import { useSelectedTheme } from "../../context/selectedThemeContext";
 import {
   Guitar,
   Drum,
@@ -42,6 +43,7 @@ const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
   const [isVisible, setVisible] = useState(false);
   const [isConfimationModalVisible, setConfimationModalVisible] =
     useState(false);
+  const { selectedTheme } = useSelectedTheme();
 
   const handleLongPress = () => {
     setVisible(true);
@@ -52,7 +54,6 @@ const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
     setVisible(false);
   };
   const handleDelete = async () => {
-    console.log("delete");
     setToastMessage(`${song.title} supprimer avec succes !`);
     await historyService.removeHistoryItem(song.id);
     setVisible(false);
@@ -91,7 +92,10 @@ const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
 
   return (
     <TouchableOpacity
-      style={styles.container}
+      style={[
+        styles.container,
+        { backgroundColor: selectedTheme.SecondaryColor },
+      ]}
       onLongPress={handleLongPress}
       onPress={() => handlePress()}
     >
@@ -103,12 +107,12 @@ const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
           options={[
             {
               label: " Télécharger",
-              icon: <Download color={MainColor.AccentColor} />,
+              icon: <Download color={selectedTheme.AccentColor} />,
               onPress: handleDownload,
             },
             {
               label: " Supprimer",
-              icon: <Trash color={MainColor.AccentColor} />,
+              icon: <Trash color={selectedTheme.AccentColor} />,
               color: "red",
               onPress: () => {
                 setVisible(false);
@@ -117,7 +121,7 @@ const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
             },
             {
               label: " Fermer",
-              icon: <SquareX color={MainColor.AccentColor} />,
+              icon: <SquareX color={selectedTheme.AccentColor} />,
               onPress: () => setVisible(false),
             },
           ]}
@@ -133,7 +137,7 @@ const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
             },
             {
               label: " Annuler",
-              color: MainColor.AccentColor,
+              color: selectedTheme.AccentColor,
               onPress: () => setConfimationModalVisible(false),
             },
           ]}
@@ -145,8 +149,13 @@ const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
           onHide={() => setToastVisible(false)}
         />
         <View style={styles.titleRow}>
-          <View style={styles.iconCircle}>
-            <Music2Icon color={MainColor.AccentColor} />
+          <View
+            style={[
+              styles.iconCircle,
+              { backgroundColor: selectedTheme.bgColor },
+            ]}
+          >
+            <Music2Icon color={selectedTheme.AccentColor} />
           </View>
           <View style={styles.titleContainer}>
             <Text
@@ -162,7 +171,7 @@ const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
         <View style={styles.infoRow}>
           <View style={styles.durationContainer}>
             <Clock
-              color={MainColor.InactiveTextColor}
+              color={selectedTheme.InactiveTextColor}
               style={styles.iconMarginRight}
             />
             <Text style={GlobalStyles.Secondary_text}>03:25</Text>
@@ -170,7 +179,7 @@ const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
           <View style={styles.dateContainer}>
             <Calendar
               style={styles.iconMarginRight}
-              color={MainColor.InactiveTextColor}
+              color={selectedTheme.InactiveTextColor}
             />
             <Text style={GlobalStyles.Secondary_text}>
               {song.creationDate
@@ -183,7 +192,12 @@ const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
       {song.status != "done" && song.status != "not_found" ? (
         <LoadingScreen type="processing" height={80} width={100} />
       ) : (
-        <View style={styles.bottomContainer}>
+        <View
+          style={[
+            styles.bottomContainer,
+            { backgroundColor: selectedTheme.bgColor },
+          ]}
+        >
           <View style={styles.sizeContainer}>
             <Text style={GlobalStyles.Secondary_text}>Taille</Text>
             <Text style={GlobalStyles.Secondary_text}>200 MB</Text>
@@ -191,27 +205,27 @@ const HistoryItem = ({ status, song }: { song: SongStems; status: string }) => {
           <View style={styles.iconsContainer}>
             <RenderIcon
               iconName="voice"
-              color={MainColor.AccentColor}
+              color={selectedTheme.AccentColor}
               size={20}
             />
             <RenderIcon
               iconName="Drum"
-              color={MainColor.AccentColor}
+              color={selectedTheme.AccentColor}
               size={20}
             />
             <RenderIcon
               iconName="Guitar"
-              color={MainColor.AccentColor}
+              color={selectedTheme.AccentColor}
               size={20}
             />
             <RenderIcon
               iconName="Bass"
-              color={MainColor.AccentColor}
+              color={selectedTheme.AccentColor}
               size={20}
             />
             <RenderIcon
               iconName="others"
-              color={MainColor.AccentColor}
+              color={selectedTheme.AccentColor}
               size={20}
             />
           </View>
@@ -230,7 +244,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: MainColor.SecondaryColor,
     height: 160,
     width: "100%",
     borderRadius: 20,
@@ -253,13 +266,12 @@ const styles = StyleSheet.create({
     width: "90%",
     alignItems: "center",
     justifyContent: "flex-start",
-    //backgroundColor: MainColor.bgColor,
+    //backgroundColor: "#fff",
   },
   iconCircle: {
     width: 40,
     height: 40,
     borderRadius: 100,
-    backgroundColor: MainColor.bgColor,
     justifyContent: "center",
     alignItems: "center",
     marginRight: 10,
@@ -274,14 +286,14 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     marginHorizontal: "5%",
-    // backgroundColor: MainColor.AccentColor,
+    // backgroundColor: "#fff",
     justifyContent: "space-between",
   },
   durationContainer: {
     display: "flex",
     flexDirection: "row",
     alignItems: "center",
-    //backgroundColor: MainColor.PrimaryColor,
+    //backgroundColor: "#fff",
     width: "50%",
     justifyContent: "flex-start",
   },
@@ -296,9 +308,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   bottomContainer: {
-    backgroundColor: MainColor.tabBarColor,
     width: "80%",
-
     borderRadius: 100,
     marginBottom: "5%",
     display: "flex",
@@ -307,9 +317,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   sizeContainer: {
-    //backgroundColor: MainColor.ButtonColor,
+    //backgroundColor: "#fff",
     width: "50%",
-    // backgroundColor: MainColor.AccentColor,
+    // backgroundColor: "#fff",
     display: "flex",
     paddingHorizontal: "5%",
     flexDirection: "column",
@@ -317,7 +327,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   iconsContainer: {
-    //backgroundColor: MainColor.ButtonColor,
+    //backgroundColor: "#fff",
     width: "50%",
     display: "flex",
     paddingHorizontal: "5%",

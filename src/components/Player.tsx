@@ -1,11 +1,19 @@
 //import liraries
 import React, { Component, useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { GlobalStyles, MainColor } from "../style/global.style";
+import { GlobalStyles } from "../style/global.style";
+import { useSelectedTheme } from "../../context/selectedThemeContext";
 
 import Slider from "@react-native-community/slider";
 
-import { Pause, Play, RotateCcw, RotateCw } from "lucide-react-native";
+import {
+  Pause,
+  Play,
+  RotateCcw,
+  RotateCw,
+  SkipBack,
+  SkipForward,
+} from "lucide-react-native";
 
 import { useSelectedSong } from "../../context/selectedSnongContext";
 
@@ -22,31 +30,34 @@ const formatTime = (duration: number): string => {
 const Player = () => {
   const [isPaused, setIsPaused] = useState(true);
   const { position, duration, SeekAll, PlayAll, PauseAll } = useSelectedSong();
+  const { selectedTheme } = useSelectedTheme();
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { backgroundColor: selectedTheme.tabBarColor }]}
+    >
       <View
         style={{
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          width: "90%",
+          width: "80%",
         }}
       >
         <Text style={GlobalStyles.Secondary_text}>{formatTime(position)}</Text>
         <Text style={GlobalStyles.Secondary_text}>{formatTime(duration)}</Text>
       </View>
       <Slider
-        style={{ width: "90%", height: 60 }}
+        style={{ width: "90%", height: 30 }}
         minimumValue={0}
         maximumValue={duration || 1}
         value={position}
         onValueChange={(value) => {
           SeekAll(value);
         }}
-        thumbTintColor={MainColor.AccentColor}
-        minimumTrackTintColor={MainColor.AccentColor}
-        maximumTrackTintColor={MainColor.InactiveTextColor}
+        thumbTintColor={selectedTheme.AccentColor}
+        minimumTrackTintColor={selectedTheme.AccentColor}
+        maximumTrackTintColor={selectedTheme.InactiveTextColor}
       />
 
       <View
@@ -55,7 +66,7 @@ const Player = () => {
           flexDirection: "row",
           justifyContent: "space-between",
           alignItems: "center",
-          width: "70%",
+          width: "80%",
         }}
       >
         <TouchableOpacity
@@ -63,13 +74,23 @@ const Player = () => {
             SeekAll(position - 10);
           }}
         >
-          <RotateCcw
+          <SkipBack
             style={{ width: 40, height: 40 }}
-            color={MainColor.ButtonColor}
+            color={selectedTheme.ButtonColor}
           />
         </TouchableOpacity>
 
         <TouchableOpacity
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: 100,
+            backgroundColor: selectedTheme.SecondaryColor,
+            height: 70,
+            width: 70,
+          }}
           onPress={() => {
             if (isPaused) {
               PlayAll();
@@ -83,12 +104,12 @@ const Player = () => {
           {isPaused ? (
             <Play
               style={{ width: 40, height: 40 }}
-              color={MainColor.ButtonColor}
+              color={selectedTheme.ButtonColor}
             />
           ) : (
             <Pause
               style={{ width: 40, height: 40 }}
-              color={MainColor.ButtonColor}
+              color={selectedTheme.ButtonColor}
             />
           )}
         </TouchableOpacity>
@@ -98,9 +119,9 @@ const Player = () => {
             SeekAll(position + 10);
           }}
         >
-          <RotateCw
+          <SkipForward
             style={{ width: 40, height: 40 }}
-            color={MainColor.ButtonColor}
+            color={selectedTheme.ButtonColor}
           />
         </TouchableOpacity>
       </View>
@@ -115,7 +136,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: MainColor.tabBarColor,
+    backgroundColor: "#222", // fallback, will be overridden by style prop
     height: "20%",
     width: "100%",
     borderTopLeftRadius: 20,

@@ -1,7 +1,8 @@
 import React, { ReactNode } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
 import Modal from "react-native-modal";
-import { GlobalStyles, MainColor } from "../style/global.style";
+import { GlobalStyles } from "../style/global.style";
+import { useSelectedTheme } from "../../context/selectedThemeContext";
 
 type Option = {
   label: string;
@@ -23,6 +24,7 @@ const CustomModal = ({
   title,
   options,
 }: CustomModalProps) => {
+  const { selectedTheme } = useSelectedTheme();
   return (
     <>
       <Modal
@@ -33,14 +35,14 @@ const CustomModal = ({
       >
         <View
           style={{
-            backgroundColor: MainColor.SecondaryColor,
+            backgroundColor: selectedTheme.SecondaryColor,
             borderRadius: 15,
             padding: 20,
           }}
         >
           <Text
             style={{
-              color: MainColor.TextColor,
+              color: selectedTheme.TextColor,
               fontWeight: "bold",
               marginBottom: 10,
             }}
@@ -74,7 +76,6 @@ const CustomModal = ({
           ))}
         </View>
       </Modal>
-      ;
     </>
   );
 };

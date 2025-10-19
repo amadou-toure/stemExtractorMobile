@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { View, TouchableOpacity, FlatList, Text } from "react-native";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
-import { GlobalStyles, MainColor } from "../style/global.style";
+import { GlobalStyles } from "../style/global.style";
+import { useSelectedTheme } from "../../context/selectedThemeContext";
 import { Plus, SquareDashed } from "lucide-react-native";
 import HistoryItem from "../components/historyItem";
 import { SongStems } from "../types/types";
@@ -14,6 +15,7 @@ import CustomToast from "../components/CustomToast";
 // create a component
 const HistoryScreen = () => {
   const navigator: any = useNavigation();
+  const { selectedTheme } = useSelectedTheme();
 
   const [data, setData] = useState<SongStems[]>([]);
   const [toastVisible, setToastVisible] = useState(false);
@@ -70,7 +72,7 @@ const HistoryScreen = () => {
     historyService.readHistory().then((history: SongStems[]) => {
       setData(history);
       history.forEach((element) => {
-        checkStatus(element); // 🔹 On appelle bien la fonction ici
+        checkStatus(element);
       });
     });
   });
@@ -90,68 +92,59 @@ const HistoryScreen = () => {
       style={[
         GlobalStyles.container,
         {
-          backgroundColor: MainColor.bgColor,
+          backgroundColor: selectedTheme.bgColor,
           paddingTop: "20%",
         },
       ]}
     >
-      <FlatList
-        //contentContainerStyle={GlobalStyles.container}
-        contentContainerStyle={{
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-        }}
-        style={{
-          flex: 1,
-        }}
-        showsVerticalScrollIndicator={false}
-        data={data}
-        renderItem={renderItem}
-      />
-
-      {/* <TouchableOpacity
-        style={[
-          {
-            position: "absolute",
-            zIndex: 10,
-            left: 10,
-            right: 10,
-            bottom: 70,
-            display: "flex",
+      {data.length === 0 ? (
+        <View
+          style={{
+            flex: 1,
             justifyContent: "center",
             alignItems: "center",
-          },
-          GlobalStyles.circularButton,
-        ]}
-        onPress={() => {
-          setToastMessage("Ceci est un message de test");
-          setToastType("info");
-          setToastVisible(true);
-        }}
-      >
-        <Text style={{ color: MainColor.SecondaryColor, fontSize: 16 }}>
-          Afficher Toast
-        </Text>
-      </TouchableOpacity> */}
+            width: "100%",
+          }}
+        >
+          <Text style={{ color: selectedTheme.SecondaryColor, fontSize: 18 }}>
+            Aucun historique disponible
+          </Text>
+        </View>
+      ) : (
+        <FlatList
+          //contentContainerStyle={GlobalStyles.container}
+          contentContainerStyle={{
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+          }}
+          style={{
+            flex: 1,
+          }}
+          showsVerticalScrollIndicator={false}
+          data={data}
+          renderItem={renderItem}
+        />
+      )}
 
       <TouchableOpacity
         style={[
           {
             position: "absolute",
             zIndex: 10,
-            left: 10,
             right: 10,
+
             bottom: 10,
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
+            backgroundColor: selectedTheme.AccentColor,
           },
           GlobalStyles.circularButton,
         ]}
         onPress={() => navigator.navigate("upload")}
       >
-        <Plus color={MainColor.SecondaryColor} size={50} />
+        <Plus color={selectedTheme.SecondaryColor} size={50} />
       </TouchableOpacity>
 
       <CustomToast

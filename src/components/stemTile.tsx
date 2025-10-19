@@ -2,7 +2,8 @@
 import React, { Component, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { StemFile } from "../types/types";
-import { GlobalStyles, MainColor } from "../style/global.style";
+import { GlobalStyles } from "../style/global.style";
+import { useSelectedTheme } from "../../context/selectedThemeContext";
 import {
   AudioLines,
   Drum,
@@ -26,16 +27,21 @@ const StemTile = ({
   setVolume: React.Dispatch<React.SetStateAction<number>>;
 }) => {
   const [isMuted, setMute] = useState(true);
+  const { selectedTheme } = useSelectedTheme();
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: selectedTheme.SecondaryColor },
+      ]}
+    >
       <View
         style={{
           display: "flex",
           flexDirection: "row",
           justifyContent: "center",
           alignItems: "center",
-          //backgroundColor: MainColor.AccentColor,
           width: "100%",
         }}
       >
@@ -45,18 +51,17 @@ const StemTile = ({
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            //backgroundColor: MainColor.InactiveTextColor,
             width: "15%",
           }}
         >
           {file.name === "vocals.wav" ? (
-            <Mic color={MainColor.ButtonColor} />
+            <Mic color={selectedTheme.ButtonColor} />
           ) : file.name === "bass.wav" ? (
-            <Speaker color={MainColor.ButtonColor} />
+            <Speaker color={selectedTheme.ButtonColor} />
           ) : file.name === "drums.wav" ? (
-            <Drum color={MainColor.ButtonColor} />
+            <Drum color={selectedTheme.ButtonColor} />
           ) : (
-            <AudioLines color={MainColor.ButtonColor} />
+            <AudioLines color={selectedTheme.ButtonColor} />
           )}
         </View>
         <View
@@ -65,7 +70,6 @@ const StemTile = ({
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            //backgroundColor: MainColor.ButtonColor,
             width: "60%",
           }}
         >
@@ -75,9 +79,9 @@ const StemTile = ({
             onValueChange={setVolume}
             minimumValue={0.0001}
             maximumValue={1.0}
-            thumbTintColor={MainColor.AccentColor}
-            minimumTrackTintColor={MainColor.AccentColor}
-            maximumTrackTintColor={MainColor.InactiveTextColor}
+            thumbTintColor={selectedTheme.AccentColor}
+            minimumTrackTintColor={selectedTheme.AccentColor}
+            maximumTrackTintColor={selectedTheme.InactiveTextColor}
             style={{
               width: "100%",
               height: 40, // augmente la hauteur globale
@@ -91,7 +95,6 @@ const StemTile = ({
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            // backgroundColor: MainColor.InactiveTextColor,
             width: "15%",
           }}
           onPress={() => {
@@ -105,9 +108,9 @@ const StemTile = ({
           }}
         >
           {isMuted ? (
-            <Volume2 color={MainColor.ButtonColor} />
+            <Volume2 color={selectedTheme.ButtonColor} />
           ) : (
-            <VolumeOff color={MainColor.ButtonColor} />
+            <VolumeOff color={selectedTheme.ButtonColor} />
           )}
         </TouchableOpacity>
       </View>
@@ -122,7 +125,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: MainColor.SecondaryColor,
+    // backgroundColor is set dynamically using selectedTheme.SecondaryColor
     height: 100,
     width: "100%",
     borderRadius: 20,

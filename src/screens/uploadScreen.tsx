@@ -1,7 +1,7 @@
 //import liraries
 import React, { useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
-import { GlobalStyles, MainColor } from "../style/global.style";
+import { GlobalStyles } from "../style/global.style";
 import { Upload } from "lucide-react-native";
 import * as DocumentPicker from "expo-document-picker";
 import { useLoading } from "../../context/loadingContext";
@@ -9,10 +9,12 @@ import { UnmixService } from "../services/unmixService";
 import { SongStems } from "../types/types";
 import { historyService } from "../services/historyService";
 import CustomToast from "../components/CustomToast";
+import { useSelectedTheme } from "../../context/selectedThemeContext";
 
 // create a component
 const UploadScreen = () => {
   const { setLoading } = useLoading();
+  const { selectedTheme } = useSelectedTheme();
   const [visble, setVisible] = useState(false);
   const [message, setMessage] = useState("");
   const [selectedFile, setSelectedFile] = useState<{
@@ -81,23 +83,43 @@ const UploadScreen = () => {
 
   return (
     <View
-      style={[GlobalStyles.container, { backgroundColor: MainColor.bgColor }]}
+      style={[
+        GlobalStyles.container,
+        { backgroundColor: selectedTheme.bgColor },
+      ]}
     >
       {selectedFile ? (
         <>
-          <View style={styles.fileInfo}>
+          <View
+            style={[
+              styles.fileInfo,
+              { backgroundColor: selectedTheme.SecondaryColor },
+            ]}
+          >
             <Text style={GlobalStyles.Large_text}>{selectedFile.name}</Text>
             <Text style={GlobalStyles.Large_text}>
               {(selectedFile.size / 1000000).toFixed(2)} mb
             </Text>
           </View>
-          <TouchableOpacity style={styles.button} onPress={handleUnmix}>
+          <TouchableOpacity
+            style={[
+              styles.button,
+              { backgroundColor: selectedTheme.AccentColor },
+            ]}
+            onPress={handleUnmix}
+          >
             <Text style={GlobalStyles.Title_text}>Separate</Text>
           </TouchableOpacity>
         </>
       ) : (
-        <TouchableOpacity style={styles.filePicker} onPress={pickFile}>
-          <Upload color={MainColor.AccentColor} size={150} />
+        <TouchableOpacity
+          style={[
+            styles.filePicker,
+            { backgroundColor: selectedTheme.SecondaryColor },
+          ]}
+          onPress={pickFile}
+        >
+          <Upload color={selectedTheme.AccentColor} size={150} />
           <Text style={GlobalStyles.Primary_text}>
             Click here to select a file
           </Text>
@@ -118,7 +140,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-around",
     alignItems: "center",
-    backgroundColor: MainColor.SecondaryColor,
     height: "40%",
     width: "80%",
     borderRadius: 20,
@@ -127,7 +148,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-around",
     alignItems: "center",
-    backgroundColor: MainColor.AccentColor,
     height: "10%",
     width: "80%",
     marginTop: 20,
@@ -137,7 +157,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-around",
     alignItems: "center",
-    backgroundColor: MainColor.SecondaryColor,
     height: "40%",
     width: "80%",
     borderRadius: 20,

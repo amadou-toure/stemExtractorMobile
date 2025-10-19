@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mobileDemucs",
-    "slug": "mobileDemucs",
+    "name": "SLICE",
+    "slug": "slice",
     "version": "1.0.0",
     "plugins": [
       [
@@ -31,17 +31,17 @@
       ]
     ],
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/logo.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/splash-icon.png",
+      "image": "./assets/logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.nanfahwa.mobileDemucs",
+      "bundleIdentifier": "com.nanfahwa.slice",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "UIBackgroundModes": ["audio"]
@@ -55,13 +55,13 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.nanfahwa.mobileDemucs",
+      "package": "com.nanfahwa.slice",
       "permissions": ["WAKE_LOCK"],
       "playSoundInBackground": true
     },
     "web": {
       "bundler": "metro",
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/logo.png"
     },
     "extra": {
       "eas": {

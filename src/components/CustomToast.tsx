@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { Animated, Text, View } from "react-native";
-import { MainColor } from "../style/global.style";
+import { useSelectedTheme } from "../../context/selectedThemeContext";
 import { CheckCircle, XCircle, AlertTriangle, Info } from "lucide-react-native";
 
 type ToastType = "success" | "error" | "warning" | "info";
@@ -20,6 +20,7 @@ const CustomToast = ({
   duration = 2500,
   onHide,
 }: ToastProps) => {
+  const { selectedTheme } = useSelectedTheme();
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const iconMap = {
@@ -57,14 +58,16 @@ const CustomToast = ({
     <Animated.View
       style={{
         position: "absolute",
-        bottom: 200,
-        alignSelf: "center",
-        backgroundColor: MainColor.SecondaryColor,
+        bottom: 50,
+        left: 0,
+        right: 0,
+        justifyContent: "center",
+        alignItems: "center",
+        backgroundColor: selectedTheme.SecondaryColor,
         borderRadius: 10,
         paddingHorizontal: 20,
         paddingVertical: 10,
         flexDirection: "row",
-        alignItems: "center",
         shadowColor: "#000",
         shadowOpacity: 0.25,
         shadowRadius: 10,
@@ -75,7 +78,7 @@ const CustomToast = ({
       {iconMap[type]}
       <Text
         style={{
-          color: MainColor.TextColor,
+          color: selectedTheme.TextColor,
           marginLeft: 10,
           fontWeight: "600",
         }}

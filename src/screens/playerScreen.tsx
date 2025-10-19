@@ -3,7 +3,8 @@ import React, { Component } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { useSelectedSong } from "../../context/selectedSnongContext";
-import { GlobalStyles, MainColor } from "../style/global.style";
+import { GlobalStyles } from "../style/global.style";
+import { useSelectedTheme } from "../../context/selectedThemeContext";
 import { Download } from "lucide-react-native";
 import stemTile from "../components/stemTile";
 import StemTile from "../components/stemTile";
@@ -11,6 +12,7 @@ import Player from "../components/Player";
 
 // create a component
 const PlayerScreen = () => {
+  const { selectedTheme } = useSelectedTheme();
   const {
     setSelectedSong,
     selectedSong,
@@ -25,7 +27,9 @@ const PlayerScreen = () => {
   } = useSelectedSong();
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[styles.container, { backgroundColor: selectedTheme.bgColor }]}
+    >
       {selectedSong ? (
         <View
           style={{
@@ -44,7 +48,7 @@ const PlayerScreen = () => {
               display: "flex",
               flexDirection: "row",
               justifyContent: "space-between",
-              // backgroundColor: MainColor.AccentColor,
+              // backgroundColor: selectedTheme.AccentColor,
               alignItems: "center",
             }}
           >
@@ -68,13 +72,13 @@ const PlayerScreen = () => {
                   width: 60,
                   height: 60,
                   borderRadius: 10,
-                  backgroundColor: MainColor.SecondaryColor,
+                  backgroundColor: selectedTheme.SecondaryColor,
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
                 }}
               >
-                <Download color={MainColor.AccentColor} />
+                <Download color={selectedTheme.AccentColor} />
               </View>
             </TouchableOpacity>
           </View>
@@ -139,8 +143,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-
-    backgroundColor: MainColor.bgColor,
     height: "100%",
   },
 });
