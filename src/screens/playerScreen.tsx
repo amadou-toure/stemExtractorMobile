@@ -80,7 +80,7 @@ const PlayerScreen = () => {
               <StemTile key={item.name} file={item} />
             ))}
           </View>
-          <Player audioSources={selectedSong.stems} />
+          <Player />
         </View>
       ) : (
         <Text style={GlobalStyles.Large_text}>"no song loaded"</Text>

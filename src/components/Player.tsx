@@ -3,15 +3,9 @@ import React, { Component, useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { GlobalStyles, MainColor } from "../style/global.style";
 import { Slider } from "@rneui/themed";
-import {
-  Play,
-  RotateCcw,
-  RotateCw,
-  SkipBack,
-  SkipForward,
-} from "lucide-react-native";
-import { useAudioPlayer } from "expo-audio";
-import { StemFile } from "../types/types";
+import { Play, RotateCcw, RotateCw } from "lucide-react-native";
+
+import { useSelectedSong } from "../../context/selectedSnongContext";
 
 // Helper function to format time in mm:ss
 const formatTime = (duration: number): string => {
@@ -23,61 +17,8 @@ const formatTime = (duration: number): string => {
   return `${formattedMinutes}:${formattedSeconds}`;
 };
 
-const Player = ({ audioSources }: { audioSources: StemFile[] }) => {
-  const Bassplayer = useAudioPlayer({
-    uri: audioSources[0].uri.replace("file://", ""),
-  });
-  const Otherplayer = useAudioPlayer({
-    uri: audioSources[2].uri.replace("file://", ""),
-  });
-  const Drumplayer = useAudioPlayer({
-    uri: audioSources[1].uri.replace("file://", ""),
-  });
-  const Voiceplayer = useAudioPlayer({
-    uri: audioSources[3].uri.replace("file://", ""),
-  });
-  const PlayAll = () => {
-    Bassplayer.play();
-    Otherplayer.play();
-    Drumplayer.play();
-    Voiceplayer.play();
-  };
-  const PauseAll = () => {
-    Bassplayer.pause();
-    Otherplayer.pause();
-    Drumplayer.pause();
-    Voiceplayer.pause();
-  };
-  const SeekAll = (val: number) => {
-    PauseAll();
-    Bassplayer.seekTo(val);
-    Otherplayer.seekTo(val);
-    Drumplayer.seekTo(val);
-    Voiceplayer.seekTo(val);
-    PlayAll();
-  };
-  const handlePlayButton = () => {
-    PlayAll();
-  };
-  const handleSkipBackButton = () => {
-    SeekAll(position - 5);
-  };
-  const handleSkipForwardButton = () => {
-    SeekAll(position + 5);
-  };
-  const [position, setPosition] = useState(0);
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setPosition((prev) => {
-        if (Bassplayer.playing) {
-          return Bassplayer.currentTime;
-        }
-        return prev;
-      });
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
-
+const Player = () => {
+  const { position, duration, SeekAll, PlayAll } = useSelectedSong();
   return (
     <View style={styles.container}>
       <View
@@ -90,18 +31,16 @@ const Player = ({ audioSources }: { audioSources: StemFile[] }) => {
         }}
       >
         <Text style={GlobalStyles.Secondary_text}>{formatTime(position)}</Text>
-        <Text style={GlobalStyles.Secondary_text}>
-          {formatTime(Bassplayer.duration)}
-        </Text>
+        <Text style={GlobalStyles.Secondary_text}>{formatTime(duration)}</Text>
       </View>
 
       <Slider
-        value={Bassplayer.currentTime}
+        value={position}
         onValueChange={(val) => {
           SeekAll(val);
         }}
         minimumValue={0}
-        maximumValue={Bassplayer.duration || 1}
+        maximumValue={duration || 1}
         minimumTrackTintColor={MainColor.AccentColor}
         maximumTrackTintColor={MainColor.InactiveTextColor}
         style={{ width: "90%", alignSelf: "center" }}
@@ -122,21 +61,29 @@ const Player = ({ audioSources }: { audioSources: StemFile[] }) => {
           width: "70%",
         }}
       >
-        <TouchableOpacity onPress={handleSkipBackButton}>
+        <TouchableOpacity
+          onPress={() => {
+            SeekAll(position - 3);
+          }}
+        >
           <RotateCcw
             style={{ width: 40, height: 40 }}
             color={MainColor.ButtonColor}
           />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={handlePlayButton}>
+        <TouchableOpacity onPress={PlayAll}>
           <Play
             style={{ width: 40, height: 40 }}
             color={MainColor.ButtonColor}
           />
         </TouchableOpacity>
 
-        <TouchableOpacity onPress={handleSkipForwardButton}>
+        <TouchableOpacity
+          onPress={() => {
+            SeekAll(position + 3);
+          }}
+        >
           <RotateCw
             style={{ width: 40, height: 40 }}
             color={MainColor.ButtonColor}
