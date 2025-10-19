@@ -113,7 +113,6 @@ const PlayerScreen = () => {
                 default:
                   console.warn(`Aucun volume associé pour ${item.name}`);
               }
-              console.log(item.name, ": ", volume);
 
               return (
                 <StemTile

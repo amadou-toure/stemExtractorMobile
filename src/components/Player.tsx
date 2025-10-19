@@ -2,7 +2,9 @@
 import React, { Component, useEffect, useState } from "react";
 import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import { GlobalStyles, MainColor } from "../style/global.style";
-import { Slider } from "@rneui/themed";
+//import { Slider } from "@rneui/themed";
+import Slider from "@react-native-community/slider";
+//import { Slider } from "@expo/ui/jetpack-compose";
 import { Pause, Play, RotateCcw, RotateCw } from "lucide-react-native";
 
 import { useSelectedSong } from "../../context/selectedSnongContext";
@@ -34,25 +36,19 @@ const Player = () => {
         <Text style={GlobalStyles.Secondary_text}>{formatTime(position)}</Text>
         <Text style={GlobalStyles.Secondary_text}>{formatTime(duration)}</Text>
       </View>
-
       <Slider
-        value={position}
-        onValueChange={(val) => {
-          SeekAll(val);
-        }}
+        style={{ width: "90%", height: 60 }}
         minimumValue={0}
         maximumValue={duration || 1}
+        value={position}
+        onValueChange={(value) => {
+          SeekAll(value);
+        }}
+        thumbTintColor={MainColor.AccentColor}
         minimumTrackTintColor={MainColor.AccentColor}
         maximumTrackTintColor={MainColor.InactiveTextColor}
-        style={{ width: "90%", alignSelf: "center" }}
-        trackStyle={{ height: 6, borderRadius: 6 }}
-        thumbStyle={{
-          height: 18,
-          width: 18,
-          borderRadius: 18,
-          backgroundColor: MainColor.AccentColor,
-        }}
       />
+
       <View
         style={{
           display: "flex",

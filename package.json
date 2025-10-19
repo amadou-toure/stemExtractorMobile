@@ -9,6 +9,8 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@expo/ui": "^0.2.0-beta.7",
+    "@react-native-community/slider": "^5.0.1",
     "@react-navigation/bottom-tabs": "^7.4.7",
     "@react-navigation/elements": "^2.6.4",
     "@react-navigation/native": "^7.1.17",
@@ -22,6 +24,7 @@
     "expo-document-picker": "^14.0.7",
     "expo-file-system": "~19.0.17",
     "expo-status-bar": "^3.0.8",
+    "install": "^0.13.0",
     "lottie-react-native": "^7.3.4",
     "lucide-react-native": "^0.544.0",
     "nativewind": "^4.2.1",

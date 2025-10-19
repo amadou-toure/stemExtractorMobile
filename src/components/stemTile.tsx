@@ -11,8 +11,8 @@ import {
   Volume2,
   VolumeOff,
 } from "lucide-react-native";
-//import Slider from "@react-native-community/slider";
-import { Slider } from "@rneui/themed";
+
+import Slider from "@react-native-community/slider";
 import { useSelectedSong } from "../../context/selectedSnongContext";
 
 // create a component
@@ -25,7 +25,7 @@ const StemTile = ({
   volume: number;
   setVolume: React.Dispatch<React.SetStateAction<number>>;
 }) => {
-  const [isMuted, setMute] = useState(false);
+  const [isMuted, setMute] = useState(true);
 
   return (
     <View style={styles.container}>
@@ -71,20 +71,17 @@ const StemTile = ({
         >
           <Text style={GlobalStyles.Large_text}>{file.name}</Text>
           <Slider
-            //style={{ width: "100%" }}
             value={volume}
             onValueChange={setVolume}
             minimumValue={0.0001}
             maximumValue={1.0}
+            thumbTintColor={MainColor.AccentColor}
             minimumTrackTintColor={MainColor.AccentColor}
             maximumTrackTintColor={MainColor.InactiveTextColor}
-            style={{ width: "100%", alignSelf: "center" }}
-            trackStyle={{ height: 6, borderRadius: 6 }}
-            thumbStyle={{
-              height: 18,
-              width: 18,
-              borderRadius: 18,
-              backgroundColor: MainColor.AccentColor,
+            style={{
+              width: "100%",
+              height: 40, // augmente la hauteur globale
+              alignSelf: "center",
             }}
           />
         </View>
